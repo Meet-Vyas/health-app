@@ -3,6 +3,10 @@ package com.example.healthapp
 import android.Manifest
 import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -32,15 +36,22 @@ import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var viewFinder: PreviewView
     private lateinit var captureButton: Button
     private lateinit var resultTextView: TextView
+    private lateinit var measureRespiratoryRateButton: Button
     private lateinit var cameraExecutor: ExecutorService
 
     private var videoCapture: VideoCapture<Recorder>? = null
     private var recording: Recording? = null
+
+    private lateinit var sensorManager: SensorManager
+    private var accelerometer: Sensor? = null
+    private val accelValuesX = mutableListOf<Float>()
+    private val accelValuesY = mutableListOf<Float>()
+    private val accelValuesZ = mutableListOf<Float>()
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -64,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         viewFinder = findViewById(R.id.viewFinder)
         captureButton = findViewById(R.id.camera_capture_button)
         resultTextView = findViewById(R.id.resultTextView)
+        measureRespiratoryRateButton = findViewById(R.id.measure_respiratory_rate_button)
 
         captureButton.isEnabled = false
 
@@ -80,7 +92,43 @@ class MainActivity : AppCompatActivity() {
             captureVideo()
         }
 
+        measureRespiratoryRateButton.setOnClickListener {
+            startRespiratoryMeasurement()
+        }
+
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    }
+
+    private fun startRespiratoryMeasurement() {
+        accelValuesX.clear()
+        accelValuesY.clear()
+        accelValuesZ.clear()
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+
+        measureRespiratoryRateButton.postDelayed({
+            sensorManager.unregisterListener(this)
+            calculateRespiratoryRate()
+        }, 45000)
+    }
+
+    private fun calculateRespiratoryRate() {
+        val rate = RespiratoryRateCalculator.calculate(accelValuesX, accelValuesY, accelValuesZ)
+        resultTextView.text = "Respiratory Rate: $rate breaths/min"
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        event?.let {
+            accelValuesX.add(it.values[0])
+            accelValuesY.add(it.values[1])
+            accelValuesZ.add(it.values[2])
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // No action needed
     }
 
     private fun startCamera() {
@@ -237,9 +285,6 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO
             ).apply {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                }
             }.toTypedArray()
     }
 }
