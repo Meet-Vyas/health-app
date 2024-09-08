@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -43,10 +44,13 @@ class MainActivity : AppCompatActivity() {
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { _ ->
+    ) { permissions ->
+        Log.d(TAG, "Permission result: $permissions")
         if (allPermissionsGranted()) {
+            Log.d(TAG, "All permissions granted, starting camera")
             startCamera()
         } else {
+            Log.e(TAG, "Permissions not granted by the user")
             Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
             finish()
         }
@@ -54,6 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate called")
         setContentView(R.layout.activity_main)
 
         viewFinder = findViewById(R.id.viewFinder)
@@ -63,21 +68,28 @@ class MainActivity : AppCompatActivity() {
         captureButton.isEnabled = false
 
         if (allPermissionsGranted()) {
+            Log.d(TAG, "All permissions already granted, starting camera")
             startCamera()
         } else {
+            Log.d(TAG, "Requesting permissions")
             requestPermissions()
         }
 
-        captureButton.setOnClickListener { captureVideo() }
+        captureButton.setOnClickListener {
+            Log.d(TAG, "Capture button clicked")
+            captureVideo()
+        }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
     private fun startCamera() {
+        Log.d(TAG, "Starting camera")
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            Log.d(TAG, "CameraProvider obtained")
 
             val preview = Preview.Builder()
                 .build()
@@ -99,7 +111,9 @@ class MainActivity : AppCompatActivity() {
                 )
                 camera.cameraControl.enableTorch(true)
                 captureButton.isEnabled = true
+                Log.d(TAG, "Camera started successfully")
             } catch (exc: Exception) {
+                Log.e(TAG, "Failed to start camera", exc)
                 Toast.makeText(this, "Failed to start camera: ${exc.message}", Toast.LENGTH_SHORT)
                     .show()
             }
@@ -108,11 +122,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun captureVideo() {
+        Log.d(TAG, "Capturing video")
         val videoCapture = this.videoCapture ?: return
         captureButton.isEnabled = false
 
         val curRecording = recording
         if (curRecording != null) {
+            Log.d(TAG, "Stopping current recording")
             curRecording.stop()
             recording = null
             return
@@ -143,11 +159,15 @@ class MainActivity : AppCompatActivity() {
                     PackageManager.PERMISSION_GRANTED
                 ) {
                     withAudioEnabled()
+                    Log.d(TAG, "Audio recording enabled")
+                } else {
+                    Log.d(TAG, "Audio recording permission not granted")
                 }
             }
             .start(ContextCompat.getMainExecutor(this)) { recordEvent ->
                 when (recordEvent) {
                     is VideoRecordEvent.Start -> {
+                        Log.d(TAG, "Video recording started")
                         captureButton.apply {
                             text = "Stop Capture"
                             isEnabled = true
@@ -158,11 +178,13 @@ class MainActivity : AppCompatActivity() {
                         if (!recordEvent.hasError()) {
                             val msg =
                                 "Video capture succeeded: ${recordEvent.outputResults.outputUri}"
+                            Log.d(TAG, msg)
                             Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                             calculateHeartRate(recordEvent.outputResults.outputUri)
                         } else {
                             recording?.close()
                             recording = null
+                            Log.e(TAG, "Video capture failed: ${recordEvent.error}")
                             Toast.makeText(
                                 baseContext,
                                 "Video capture failed: ${recordEvent.error}",
@@ -179,17 +201,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun calculateHeartRate(uri: Uri) {
+        Log.d(TAG, "Calculating heart rate from video: $uri")
         lifecycleScope.launch {
             try {
                 val heartRate = HeartRateCalculator.calculateHeartRate(uri, contentResolver)
+                Log.d(TAG, "Heart rate calculated: $heartRate BPM")
                 resultTextView.text = "Heart Rate: $heartRate BPM"
             } catch (e: Exception) {
+                Log.e(TAG, "Error calculating heart rate", e)
                 resultTextView.text = "Error: ${e.message}"
             }
         }
     }
 
     private fun requestPermissions() {
+        Log.d(TAG, "Requesting permissions: ${REQUIRED_PERMISSIONS.joinToString()}")
         requestPermissionLauncher.launch(REQUIRED_PERMISSIONS)
     }
 
@@ -199,10 +225,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d(TAG, "onDestroy called")
         cameraExecutor.shutdown()
     }
 
     companion object {
+        private const val TAG = "MainActivity"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private val REQUIRED_PERMISSIONS =
             mutableListOf(

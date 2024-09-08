@@ -12,7 +12,10 @@ import kotlinx.coroutines.withContext
 import kotlin.math.min
 
 object HeartRateCalculator {
+    private const val TAG = "HeartRateCalculator"
+
     suspend fun calculateHeartRate(uri: Uri, contentResolver: ContentResolver): Int {
+        Log.d(TAG, "Starting heart rate calculation for URI: $uri")
         return withContext(Dispatchers.IO) {
             val result: Int
             val proj = arrayOf(MediaStore.Images.Media.DATA)
@@ -20,8 +23,9 @@ object HeartRateCalculator {
             val columnIndex =
                 cursor?.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
             cursor?.moveToFirst()
-            val path = cursor?.getString(columnIndex?:0)
+            val path = cursor?.getString(columnIndex ?: 0)
             cursor?.close()
+            Log.d(TAG, "Video path: $path")
 
             val retriever = MediaMetadataRetriever()
             val frameList = ArrayList<Bitmap>()
@@ -31,6 +35,7 @@ object HeartRateCalculator {
                     retriever.extractMetadata(
                         MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT
                     )
+                Log.d(TAG, "Video duration: $duration")
                 val frameDuration = min(duration!!.toInt(), 425)
                 var i = 10
                 while (i < frameDuration) {
@@ -38,8 +43,9 @@ object HeartRateCalculator {
                     bitmap?.let { frameList.add(it) }
                     i += 15
                 }
+                Log.d(TAG, "Extracted ${frameList.size} frames from video")
             } catch (e: Exception) {
-                Log.d("MediaPath", "convertMediaUriToPath: ${e.stackTrace} ")
+                Log.e(TAG, "Error extracting frames from video", e)
             } finally {
                 retriever.release()
                 var redBucket: Long
@@ -57,17 +63,17 @@ object HeartRateCalculator {
                     }
                     a.add(redBucket)
                 }
+                Log.d(TAG, "Processed ${a.size} frames for color analysis")
+
                 val b = mutableListOf<Long>()
                 for (i in 0 until a.lastIndex - 5) {
                     val temp =
                         (a.elementAt(i) + a.elementAt(i + 1) + a.elementAt(i + 2)
-                                + a.elementAt(
-                            i + 3
-                        ) + a.elementAt(
-                            i + 4
-                        )) / 4
+                                + a.elementAt(i + 3) + a.elementAt(i + 4)) / 4
                     b.add(temp)
                 }
+                Log.d(TAG, "Created ${b.size} averaged color values")
+
                 var x = b.elementAt(0)
                 var count = 0
                 for (i in 1 until b.lastIndex) {
@@ -79,6 +85,7 @@ object HeartRateCalculator {
                 }
                 val rate = ((count.toFloat()) * 60).toInt()
                 result = (rate / 4)
+                Log.d(TAG, "Calculated heart rate: $result BPM")
             }
             result
         }
