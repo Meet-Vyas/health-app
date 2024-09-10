@@ -53,17 +53,22 @@ class SymptomRatingActivity : AppCompatActivity() {
     }
 
     private fun saveDataToDatabase() {
-        val symptomRatings = symptoms.associate { it.name to it.rating }
         val heartRate = 72.0 // Replace with actual heart rate
         val respiratoryRate = 16.0 // Replace with actual respiratory rate
-
-        Log.d("SymptomRatingActivity", "saveDataToDatabase: Preparing data to save")
-        Log.d("SymptomRatingActivity", "HeartRate: $heartRate, RespiratoryRate: $respiratoryRate, Symptoms: $symptomRatings")
 
         val healthData = HealthData(
             heartRate = heartRate,
             respiratoryRate = respiratoryRate,
-            symptoms = symptomRatings
+            nausea = symptoms.find { it.name == "Nausea" }?.rating ?: 0,
+            headache = symptoms.find { it.name == "Headache" }?.rating ?: 0,
+            fever = symptoms.find { it.name == "Fever" }?.rating ?: 0,
+            soreThroat = symptoms.find { it.name == "Sore Throat" }?.rating ?: 0,
+            cough = symptoms.find { it.name == "Cough" }?.rating ?: 0,
+            shortnessOfBreath = symptoms.find { it.name == "Shortness of Breath" }?.rating ?: 0,
+            muscleAche = symptoms.find { it.name == "Muscle Ache" }?.rating ?: 0,
+            lossOfTaste = symptoms.find { it.name == "Loss of Taste" }?.rating ?: 0,
+            feelingTired = symptoms.find { it.name == "Feeling Tired" }?.rating ?: 0,
+            dizziness = symptoms.find { it.name == "Dizziness" }?.rating ?: 0
         )
 
         lifecycleScope.launch {
