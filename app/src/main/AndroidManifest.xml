@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-<!--    need it to be true as how will we measure heart rate from video?    -->
+    <!-- Camera and microphone features -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
@@ -20,6 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
         tools:targetApi="31">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,10 +28,18 @@
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Declare SymptomRatingActivity -->
+        <activity
+            android:name=".SymptomRatingActivity"
+            android:exported="true"
+            android:label="Symptom Rating"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+        </activity>
+
     </application>
 
 </manifest>

@@ -2,6 +2,7 @@ package com.example.healthapp
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var captureButton: Button
     private lateinit var resultTextView: TextView
     private lateinit var measureRespiratoryRateButton: Button
+    private lateinit var symptomButton: Button
     private lateinit var cameraExecutor: ExecutorService
 
     private var videoCapture: VideoCapture<Recorder>? = null
@@ -76,6 +78,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         captureButton = findViewById(R.id.camera_capture_button)
         resultTextView = findViewById(R.id.resultTextView)
         measureRespiratoryRateButton = findViewById(R.id.measure_respiratory_rate_button)
+        symptomButton = findViewById(R.id.symptom_button)
 
         captureButton.isEnabled = false
 
@@ -94,6 +97,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         measureRespiratoryRateButton.setOnClickListener {
             startRespiratoryMeasurement()
+        }
+
+        symptomButton.setOnClickListener {
+            startActivity(Intent(this, SymptomRatingActivity::class.java))
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()

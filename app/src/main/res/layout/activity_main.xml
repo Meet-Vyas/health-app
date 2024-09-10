@@ -42,6 +42,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="MEASURE RESPIRATORY RATE"
+        app:layout_constraintBottom_toTopOf="@id/symptom_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/symptom_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SYMPTOMS"
+        app:layout_constraintBottom_toTopOf="@id/upload_signs_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/upload_signs_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="UPLOAD SIGNS"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
