@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 @Entity
 data class HealthData(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val heartRate: Double,
-    val respiratoryRate: Double,
+    val heartRate: Int,
+    val respiratoryRate: Int,
     val nausea: Int,
     val headache: Int,
     val fever: Int,

@@ -25,6 +25,8 @@ class SymptomRatingActivity : AppCompatActivity() {
         Symptom("Feeling Tired"),
         Symptom("Dizziness")
     )
+    private var heartRate = 0
+    private var respiratoryRate = 0
 
     private lateinit var db: AppDatabase
 
@@ -45,6 +47,14 @@ class SymptomRatingActivity : AppCompatActivity() {
         recyclerView.adapter = symptomAdapter
         Log.d("SymptomRatingActivity", "onCreate: RecyclerView and Adapter set up")
 
+        heartRate = intent.getIntExtra("HEART_RATE", 0)
+        respiratoryRate = intent.getIntExtra("RESPIRATORY_RATE", 0)
+
+        Log.d(
+            "SymptomRatingActivity",
+            "Received heartRate: $heartRate, respiratoryRate: $respiratoryRate"
+        )
+
         val uploadButton: Button = findViewById(R.id.upload_button)
         uploadButton.setOnClickListener {
             Log.d("SymptomRatingActivity", "Upload button clicked")
@@ -53,9 +63,6 @@ class SymptomRatingActivity : AppCompatActivity() {
     }
 
     private fun saveDataToDatabase() {
-        val heartRate = 72.0 // Replace with actual heart rate
-        val respiratoryRate = 16.0 // Replace with actual respiratory rate
-
         val healthData = HealthData(
             heartRate = heartRate,
             respiratoryRate = respiratoryRate,
