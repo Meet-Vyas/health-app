@@ -9,7 +9,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -42,6 +41,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var viewFinder: PreviewView
     private lateinit var captureButton: Button
     private lateinit var resultTextView: TextView
+    private lateinit var resultTextView2: TextView
     private lateinit var measureRespiratoryRateButton: Button
     private lateinit var symptomButton: Button
     private lateinit var cameraExecutor: ExecutorService
@@ -54,6 +54,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private val accelValuesX = mutableListOf<Float>()
     private val accelValuesY = mutableListOf<Float>()
     private val accelValuesZ = mutableListOf<Float>()
+
+    private var heartRate = 0
+    private var respiratoryRate = 0
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -77,6 +80,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         viewFinder = findViewById(R.id.viewFinder)
         captureButton = findViewById(R.id.camera_capture_button)
         resultTextView = findViewById(R.id.resultTextView)
+        resultTextView2 = findViewById(R.id.resultTextView2)
         measureRespiratoryRateButton = findViewById(R.id.measure_respiratory_rate_button)
         symptomButton = findViewById(R.id.symptom_button)
 
@@ -100,7 +104,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
 
         symptomButton.setOnClickListener {
-            startActivity(Intent(this, SymptomRatingActivity::class.java))
+            Log.d(TAG, "Heart rate: $heartRate, Respiratory rate: $respiratoryRate")
+
+            startActivity(Intent(this, SymptomRatingActivity::class.java).apply {
+                putExtra("HEART_RATE", heartRate)
+                putExtra("RESPIRATORY_RATE", respiratoryRate)
+            })
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -113,6 +122,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         accelValuesX.clear()
         accelValuesY.clear()
         accelValuesZ.clear()
+
+        Log.d(TAG, "Starting respiratory measurement")
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
 
         measureRespiratoryRateButton.postDelayed({
@@ -122,8 +133,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun calculateRespiratoryRate() {
-        val rate = RespiratoryRateCalculator.calculate(accelValuesX, accelValuesY, accelValuesZ)
-        resultTextView.text = "Respiratory Rate: $rate breaths/min"
+        Log.d(TAG, "Respiratory measurement stopped")
+        respiratoryRate =
+            RespiratoryRateCalculator.calculate(accelValuesX, accelValuesY, accelValuesZ)
+        Log.d(TAG, "Calculated respiratory rate: $respiratoryRate")
+        resultTextView2.text = "Respiratory Rate: $respiratoryRate breaths/min"
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
@@ -194,9 +208,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/CameraX-Video")
-            }
+            put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/CameraX-Video")
         }
 
         val mediaStoreOutputOptions = MediaStoreOutputOptions
@@ -259,7 +271,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         Log.d(TAG, "Calculating heart rate from video: $uri")
         lifecycleScope.launch {
             try {
-                val heartRate = HeartRateCalculator.calculateHeartRate(uri, contentResolver)
+                heartRate = HeartRateCalculator.calculateHeartRate(uri, contentResolver)
                 Log.d(TAG, "Heart rate calculated: $heartRate BPM")
                 resultTextView.text = "Heart Rate: $heartRate BPM"
             } catch (e: Exception) {
