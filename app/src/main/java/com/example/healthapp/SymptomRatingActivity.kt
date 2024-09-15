@@ -45,7 +45,6 @@ class SymptomRatingActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         symptomAdapter = SymptomAdapter(symptoms)
         recyclerView.adapter = symptomAdapter
-        Log.d("SymptomRatingActivity", "onCreate: RecyclerView and Adapter set up")
 
         heartRate = intent.getIntExtra("HEART_RATE", 0)
         respiratoryRate = intent.getIntExtra("RESPIRATORY_RATE", 0)
