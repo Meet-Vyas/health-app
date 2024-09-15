@@ -43,7 +43,6 @@ object HeartRateCalculator {
                     bitmap?.let { frameList.add(it) }
                     i += 15
                 }
-                Log.d(TAG, "Extracted ${frameList.size} frames from video")
             } catch (e: Exception) {
                 Log.e(TAG, "Error extracting frames from video", e)
             } finally {
@@ -63,7 +62,6 @@ object HeartRateCalculator {
                     }
                     a.add(redBucket)
                 }
-                Log.d(TAG, "Processed ${a.size} frames for color analysis")
 
                 val b = mutableListOf<Long>()
                 for (i in 0 until a.lastIndex - 5) {
@@ -72,7 +70,6 @@ object HeartRateCalculator {
                                 + a.elementAt(i + 3) + a.elementAt(i + 4)) / 4
                     b.add(temp)
                 }
-                Log.d(TAG, "Created ${b.size} averaged color values")
 
                 var x = b.elementAt(0)
                 var count = 0
@@ -85,8 +82,9 @@ object HeartRateCalculator {
                 }
                 val rate = ((count.toFloat()) * 60).toInt()
                 result = (rate / 4)
-                Log.d(TAG, "Calculated heart rate: $result BPM")
+                Log.i(TAG, "Calculated heart rate: $result BPM")
             }
+            Log.d(TAG, "Completed heart rate calculation")
             result
         }
     }

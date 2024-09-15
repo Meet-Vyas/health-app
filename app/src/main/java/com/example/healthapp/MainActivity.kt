@@ -100,10 +100,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
 
         measureRespiratoryRateButton.setOnClickListener {
+            Log.d(TAG, "Respiratory rate button clicked")
             startRespiratoryMeasurement()
         }
 
         symptomButton.setOnClickListener {
+            Log.d(TAG, "Symptom button clicked")
             Log.d(TAG, "Heart rate: $heartRate, Respiratory rate: $respiratoryRate")
 
             startActivity(Intent(this, SymptomRatingActivity::class.java).apply {
@@ -118,6 +120,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     }
 
+    //    for respiratoryRate
     private fun startRespiratoryMeasurement() {
         accelValuesX.clear()
         accelValuesY.clear()
@@ -140,6 +143,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         resultTextView2.text = "Respiratory Rate: $respiratoryRate breaths/min"
     }
 
+    //    default
     override fun onSensorChanged(event: SensorEvent?) {
         event?.let {
             accelValuesX.add(it.values[0])
@@ -148,10 +152,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
+    //    default
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // No action needed
     }
 
+    //    for heartRate
     private fun startCamera() {
         Log.d(TAG, "Starting camera")
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -281,6 +286,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
+    //    permissions
     private fun requestPermissions() {
         Log.d(TAG, "Requesting permissions: ${REQUIRED_PERMISSIONS.joinToString()}")
         requestPermissionLauncher.launch(REQUIRED_PERMISSIONS)
