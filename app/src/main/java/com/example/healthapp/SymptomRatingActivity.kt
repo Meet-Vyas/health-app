@@ -78,6 +78,7 @@ class SymptomRatingActivity : AppCompatActivity() {
         )
 
         lifecycleScope.launch {
+            Log.d("SymptomRatingActivity", "Trying to save data to database")
             db.healthDataDao().insert(healthData)
             Log.d("SymptomRatingActivity", "Data saved to database successfully")
         }
