@@ -14,7 +14,6 @@ object RespiratoryRateCalculator {
         accelValuesZ: MutableList<Float>
     ): Int {
         Log.d(TAG, "Starting respiratory rate calculation")
-        Log.d(TAG, "Number of samples: X=${accelValuesX.size}, Y=${accelValuesY.size}, Z=${accelValuesZ.size}")
 
         var previousValue = 10f
         var k = 0
@@ -25,12 +24,8 @@ object RespiratoryRateCalculator {
                         accelValuesY[i].toDouble().pow(2.0)
             ).toFloat()
 
-            Log.v(TAG, "Sample $i: X=${accelValuesX[i]}, Y=${accelValuesY[i]}, Z=${accelValuesZ[i]}")
-            Log.v(TAG, "Current value: $currentValue, Previous value: $previousValue")
-
             if (abs(previousValue - currentValue) > 0.15) {
                 k++
-                Log.d(TAG, "Significant change detected at sample $i. K incremented to $k")
             }
             previousValue = currentValue
         }
