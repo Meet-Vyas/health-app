@@ -77,6 +77,8 @@ class SymptomRatingActivity : AppCompatActivity() {
             dizziness = symptoms.find { it.name == "Dizziness" }?.rating ?: 0
         )
 
+        Log.d("SymptomRatingActivity", "HealthData: $healthData")
+
         lifecycleScope.launch {
             Log.d("SymptomRatingActivity", "Trying to save data to database")
             db.healthDataDao().insert(healthData)
