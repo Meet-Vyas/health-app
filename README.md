@@ -61,7 +61,7 @@ bHealthy application suite how can you provide feedback to the user and develop 
 to improve context sensing and use that to generate the model of the user? (15 points)**
 
 Answer:
-Project1 is the basic version of the bHealthy suite which only generates heartRate and
+Project1 is the basic version of the bHealthy suite, which only generates heartRate and
 respiratoryRate and takes in the symptoms from the user itself whereas the bHealthy app tries to
 make itself as an application aware adaption app, adapting itself according to the user mood
 changes. We can enhance our app in numerous ways:
@@ -73,7 +73,7 @@ Ways to make it a novel application:
    incorporate EEG sensors as used in bHealthy. This will allow us to collect more physiological
    data.
 2. Implement an assessment application:
-   Develop a module that uses the collected physiological signals to detect the user's mental and
+   Develop an app that uses the collected physiological signals to detect the user's mental and
    physical state. For example, we can use EEG data to assess mental states like boredom,
    excitement, meditation, and frustration, like bHealthy's approach.
 3. Create an activity suggestion module:
@@ -85,7 +85,7 @@ Ways to make it a novel application:
    with other apps which promote healthy activities.
 5. Implement context sensing:
    We can use the smartphone's sensors (GPS) to detect the user's location, to know about the user
-   context.
+   context and later integrate it with AI models to improve other detections.
 6. Generate a user model:
    We can combine the physiological data, symptoms, context information, and user interactions with
    the app to create a comprehensive user model. It can be continuously updated to provide
@@ -109,7 +109,7 @@ Ways to provide feedback to the user:
 By implementing these features, we can transform our existing symptom-tracking app into a
 comprehensive wellness application suite that provides personalized feedback, improves context
 sensing, and generates a detailed model of the user's health and behavior patterns. This approach
-can lead to more effective interventions and better health outcomes for users.
+can lead to better health outcomes for users.
 
 ---
 
@@ -119,14 +119,15 @@ mobile computing is about and why? If no, please explain why you still think mob
 mostly about app development, providing examples to support your viewpoint (10 points)**
 
 Answer:
-After working on the Project1, my views changed about mobile computing not being just app
-development, and after reading the research papers my view are now solidified. The following are the
-reasons why I feel so:
+After working on the Project1, my views changed about mobile computing not just being app
+development, and after reading the research papers my views are now solidified. The following are
+the reasons why I feel so:
 
 1. Integration of hardware and software:
    The bHealthy system described in the first paper demonstrates how mobile computing involves a
    tight integration of hardware (sensors like ECG, EEG, accelerometers) with software applications.
-   This goes beyond simple app development (which was my view like ToDo application, etc.)
+   This goes beyond simple app development (which was my view like simple applications: ToDo
+   application, etc.)
 2. Real-time processing and feedback:
    The emphasis on real-time processing of medical data and providing immediate feedback
    demonstrates that mobile computing often deals with time-sensitive applications, requiring
